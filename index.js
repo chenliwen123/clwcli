@@ -4,11 +4,15 @@
 const { program } = require('commander');
 const download = require('download-git-repo');
 const handlebars = require('handlebars');
-const inquirer = require('inquirer')
 const fs = require('fs')
 const ora = require('ora');
 const chalk = require('chalk');
 const logsymbols = require('log-symbols')
+const readline = require('readline');
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
 const templates = {
   'mobile' : {
     url:"https://github.com/chenliwen123/mobile",
@@ -20,7 +24,6 @@ program
 program
   .command('init <project>')
   .description('初始化 移动端 ')
-  .option("-s, --setup_mode [mode]", "Which setup mode to use")
   .action(function(project){
     const loing = ora("下载中...").start();
     download(templates['mobile'].downloadurl,project,{clone:true},(err) =>{
@@ -45,17 +48,37 @@ program
   program
   .command('vues <filename>')
   .description('新建vue 初始化文件')
-  .option("-s, --setup_mode [mode]", "Which setup mode to use")
-  .action(function(filename){
+  .action(async function(filename,query){
     const vueurl = `${__dirname}/index.vue`;
     const exportjs = `${__dirname}/export.js`;
     const vuecontent = fs.readFileSync(vueurl,'utf8');
     const exportjscontent = fs.readFileSync(exportjs,'utf8');
-    const newvuecontent = handlebars.compile(vuecontent)({name:filename})
-    const newexportjscontent = handlebars.compile(exportjscontent)({name:filename})
-    fs.mkdirSync(`./${filename}`)
-    fs.writeFileSync(`./${filename}/${filename}.vue`,newvuecontent)
-    fs.writeFileSync(`./${filename}/index.js`,newexportjscontent)
+    await rl.question(`文件夹名称(${filename})? `, (name) => {
+      rl.question(`文件名称(${filename})? `, (country) => {
+        if(name == ''){
+          name = filename;
+        }
+        if(country == ''){
+          country = filename;
+        }
+        const newvuecontent = handlebars.compile(vuecontent)({name:country})
+        const newexportjscontent = handlebars.compile(exportjscontent)({name:country})
+        fs.mkdirSync(`./${name}`)
+        fs.writeFileSync(`./${name}/${country}.vue`,newvuecontent)
+        fs.writeFileSync(`./${name}/index.js`,newexportjscontent)
+        rl.close();
+      });
+  
   });
-
+    
+  });
+// program
+//   .version('0.1.0')
+//   .command('rmdir')
+//   .arguments('<dirs...>')
+//   .action(function (dirs) {
+//     dirs.forEach((dir) => {
+//       console.log('rmdir %s', dir);
+//     });
+//   })
 program.parse(process.argv);
