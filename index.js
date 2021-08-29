@@ -48,7 +48,7 @@ program
   program
   .command('vues <filename>')
   .description('新建vue 初始化文件')
-  .action(async function(filename,query){
+  .action(async function(filename){
     const vueurl = `${__dirname}/index.vue`;
     const exportjs = `${__dirname}/export.js`;
     const vuecontent = fs.readFileSync(vueurl,'utf8');
