@@ -30,7 +30,7 @@ program
     loing = ora("下载中...").start();
     download(templates['mobile'].downloadurl,project,{clone:true},(err) =>{
       if(err){
-        loing.fail();
+        loing.fail('下载失败');
         console.log(logsymbols.error,chalk.red(err));
         return
       }
@@ -73,16 +73,18 @@ program
   
   });    
 });
-function push(src,num = 0){
+function pushfun(src,num = 0){
   let push = shell.exec(src)
   if(push.code == 0){
-    loing.succeed();
+    loing.succeed('推送成功');
   }else{
-    if(push.stderr.indexOf('Timed out') > -1 & num<= 2){
+    if(push.stderr.indexOf('Timed out') > -1 && num <= 2){
       console.log('推送超时,即将重新推送！');
-      push(src,num++)
+      loing = ora("上传中...").start();
+      pushfun(src,++num);
+    }else{
+      loing.fail('推送失败');
     }
-    loing.fail();
   }
 }
 program
@@ -109,7 +111,7 @@ program
         console.log(`git push origin ${stdout}:${stdout}`)
         loing = ora("上传中...").start();
         setTimeout(() => {
-          push(`git push origin ${stdout}:${stdout}`)
+          pushfun(`git push origin ${stdout}:${stdout}`)
         }, 10000);
       }
       
