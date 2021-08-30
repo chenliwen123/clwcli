@@ -9,6 +9,7 @@ const ora = require('ora');
 const chalk = require('chalk');
 const logsymbols = require('log-symbols')
 const readline = require('readline');
+var shell = require("shelljs");
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
@@ -69,16 +70,38 @@ program
         rl.close();
       });
   
-  });
-    
-  });
-// program
-//   .version('0.1.0')
-//   .command('rmdir')
-//   .arguments('<dirs...>')
-//   .action(function (dirs) {
-//     dirs.forEach((dir) => {
-//       console.log('rmdir %s', dir);
-//     });
-//   })
+  });    
+});
+
+program
+.command('cpush <commit> [build]')
+.description('自动打包，打包后自动提交')
+.action(async function(commit,build){
+  let flag = false
+  if(build == true){
+    console.log('打包当前项目');
+    if( shell.exec("npm run build:test").code == 0){
+      console.log('打包成功，提交项目，表明意见描述：' + commit);
+      flag = true
+    }
+  }
+    console.log('获取当前分支');
+    let stdout = shell.exec("git rev-parse --abbrev-ref HEAD")
+    console.log('当前分支为：' + stdout);
+    stdout = stdout.substring(stdout.length-1,-1)
+    console.log(stdout)
+    if(shell.exec(`git add -A .`) == 0){
+      console.log('提交全部')
+      if(shell.exec(`git commit -m ${commit}`).code == 0){
+        console.log(`git push origin ${stdout}:${stdout}`)
+        setTimeout(() => {
+          if(shell.exec(`git push origin ${commit}:${stdout}`) == 0){
+            console.log('推送成功')
+          }
+        }, 5000);
+      }
+      
+    }
+});
+
 program.parse(process.argv);
