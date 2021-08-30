@@ -80,7 +80,7 @@ function pushfun(src,num = 0){
   }else{
     if(push.stderr.indexOf('Timed out') > -1 && num <= 2){
       console.log('推送超时,即将重新推送！');
-      loing = ora("上传中...").start();
+      loing.start('上传中···');
       pushfun(src,++num);
     }else{
       loing.fail('推送失败');
@@ -92,8 +92,7 @@ program
 .description('自动打包，打包后自动提交')
 .action(async function(commit,build){
   let flag = false
-  
-  if(build == true){
+  if(build == 'true'){
     console.log('打包当前项目');
     if( shell.exec("npm run build:test").code == 0){
       console.log('打包成功，提交项目，表明意见描述：' + commit);
