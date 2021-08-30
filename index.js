@@ -95,10 +95,8 @@ program
       if(shell.exec(`git commit -m ${commit}`).code == 0){
         console.log(`git push origin ${stdout}:${stdout}`)
         setTimeout(() => {
-          if(shell.exec(`git push origin ${commit}:${stdout}`) == 0){
-            console.log('推送成功')
-          }
-        }, 5000);
+          console.log(shell.exec(`git push origin ${stdout}:${stdout}`))
+        }, 10000);
       }
       
     }
