@@ -20,13 +20,14 @@ const templates = {
     downloadurl:'http://github.com:chenliwen123/mobile#master'
   }
 }
+let loing = null;
 program
   .version('1.1.1')
 program
   .command('init <project>')
   .description('初始化 移动端 ')
   .action(function(project){
-    const loing = ora("下载中...").start();
+    loing = ora("下载中...").start();
     download(templates['mobile'].downloadurl,project,{clone:true},(err) =>{
       if(err){
         loing.fail();
@@ -72,12 +73,24 @@ program
   
   });    
 });
-
+function push(src,num = 0){
+  let push = shell.exec(src)
+  if(push.code == 0){
+    loing.succeed();
+  }else{
+    if(push.stderr.indexOf('Timed out') > -1 & num<= 2){
+      console.log('推送超时,即将重新推送！');
+      push(src,num++)
+    }
+    loing.fail();
+  }
+}
 program
 .command('cpush <commit> [build]')
 .description('自动打包，打包后自动提交')
 .action(async function(commit,build){
   let flag = false
+  
   if(build == true){
     console.log('打包当前项目');
     if( shell.exec("npm run build:test").code == 0){
@@ -94,8 +107,9 @@ program
       console.log('提交全部')
       if(shell.exec(`git commit -m ${commit}`).code == 0){
         console.log(`git push origin ${stdout}:${stdout}`)
+        loing = ora("上传中...").start();
         setTimeout(() => {
-          console.log(shell.exec(`git push origin ${stdout}:${stdout}`))
+          push(`git push origin ${stdout}:${stdout}`)
         }, 10000);
       }
       
