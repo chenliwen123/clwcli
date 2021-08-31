@@ -22,7 +22,7 @@ const templates = {
 }
 let loing = null;
 program
-  .version('1.1.1')
+  .version('1.1.5')
 program
   .command('init <project>')
   .description('初始化 移动端 ')
@@ -82,6 +82,10 @@ function pushfun(src,num = 0){
       console.log('推送超时,即将重新推送！');
       loing.start('上传中···');
       pushfun(src,++num);
+    }else if(push.stderr.indexOf('SSL cerificate problem') > -1){
+      shell.exec('git config --global http.sslVerify false')
+      console.log('解决ssl证书问题，重新上传');
+      pushfun(src,num);
     }else{
       loing.fail('推送失败');
     }
