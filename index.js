@@ -22,7 +22,7 @@ const templates = {
 }
 let loing = null;
 program
-  .version('1.1.1')
+  .version('1.1.4')
 program
   .command('init <project>')
   .description('初始化 移动端 ')
