@@ -91,10 +91,6 @@ function pushfun(src,num = 0){
     }
   }
 }
-program.command('test').action(function(){
-  let status = shell.exec('git status')
-  console.log(status.indexOf('index.js'))
-})
 program
 .command('cpush <commit> [build]')
 .description('自动打包，打包后自动提交')
@@ -116,18 +112,16 @@ program
     let status = shell.exec('git status')
     if(status.indexOf('vue.config.js') > -1){
       shell.exec(`git restore --staged vue.config.js`)
-      console.log('vue.config.js 取消上传此文件')
+      console.log('vue.config.js 取消上传此文件，如果想要上传此文件请手动上传')
     }
     if(add == 0){
       console.log('提交文件')
-      if(shell.exec(`git commit -m ${commit}`).code == 0){
-        console.log(`git push origin ${stdout}:${stdout}`)
-        loing = ora("上传中...").start();
-        setTimeout(() => {
-          pushfun(`git push origin ${stdout}:${stdout}`)
-        }, 10000);
-      }
-      
+      shell.exec(`git commit -m ${commit}`)
+      console.log(`git push origin ${stdout}:${stdout}`)
+      loing = ora("上传中...").start();
+      setTimeout(() => {
+        pushfun(`git push origin ${stdout}:${stdout}`)
+      }, 10000);
     }
 });
 
