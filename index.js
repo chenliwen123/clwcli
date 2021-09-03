@@ -77,6 +77,7 @@ function pushfun(src,num = 0){
   let push = shell.exec(src)
   if(push.code == 0){
     loing.succeed('推送成功');
+    shell.exit(1)
   }else{
     if(push.stderr.indexOf('Timed out') > -1 && num <= 2){
       console.log('推送超时,即将重新推送！');
@@ -88,6 +89,7 @@ function pushfun(src,num = 0){
       pushfun(src,num);
     }else{
       loing.fail('推送失败');
+      shell.exit(1)
     }
   }
 }
