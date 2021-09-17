@@ -73,6 +73,7 @@ program
   
   });    
 });
+
 function pushfun(src,num = 0){
   let push = shell.exec(src)
   if(push.code == 0){
@@ -92,7 +93,8 @@ function pushfun(src,num = 0){
       shell.exit(1)
     }
   }
-}
+};
+
 program
 .command('cpush <commit> [build]')
 .description('自动打包，打包后自动提交')
