@@ -81,7 +81,8 @@ function transformTimestamp(){
   const D = (date.getDate() < 10 ? '0'+date.getDate() : date.getDate()) + '  ';
   const h = (date.getHours() < 10 ? '0'+date.getHours() : date.getHours()) + ':';
   const m = (date.getMinutes() <10 ? '0'+date.getMinutes() : date.getMinutes()) ;
-  const dateString = Y + M + D + h + m;
+  const s = (date.getSeconds() <10 ? '0'+date.getSeconds() : date.getSeconds()) ;
+  const dateString = Y + M + D + h + m + s;
   return dateString;
 }
 function pushfun(src,num = 0){
