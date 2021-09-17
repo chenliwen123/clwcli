@@ -22,7 +22,7 @@ const templates = {
 }
 let loing = null;
 program
-  .version('1.1.6')
+  .version('1.1.7')
 program
   .command('init <project>')
   .description('初始化 移动端 ')
@@ -73,12 +73,22 @@ program
   
   });    
 });
-
+function transformTimestamp(){
+  let a = new Date().getTime();
+  const date = new Date(a);
+  const Y = date.getFullYear() + '-';
+  const M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
+  const D = (date.getDate() < 10 ? '0'+date.getDate() : date.getDate()) + '  ';
+  const h = (date.getHours() < 10 ? '0'+date.getHours() : date.getHours()) + ':';
+  const m = (date.getMinutes() <10 ? '0'+date.getMinutes() : date.getMinutes()) ;
+  const dateString = Y + M + D + h + m;
+  return dateString;
+}
 function pushfun(src,num = 0){
   let push = shell.exec(src)
   if(push.code == 0){
     loing.succeed('推送成功');
-    console.log('当前时间是：',new Date())
+    console.log('当前时间是：',transformTimestamp())
     shell.exit(1)
   }else{
     if(push.stderr.indexOf('Timed out') > -1 && num <= 2){
