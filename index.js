@@ -78,6 +78,7 @@ function pushfun(src,num = 0){
   let push = shell.exec(src)
   if(push.code == 0){
     loing.succeed('推送成功');
+    console.log('当前时间是：',new Date())
     shell.exit(1)
   }else{
     if(push.stderr.indexOf('Timed out') > -1 && num <= 2){
