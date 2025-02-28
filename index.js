@@ -147,7 +147,7 @@ program.command('copyfile')
 .description('自动提交代码,应对代码量检查')
 .action(async function(commit,build){
     const sourceFile = path.join(process.cwd(), 'index.jsx'); // 当前目录下的 source.txt
-    const destinationFile = path.join(process.cwd(), `index${transformTimestamp()}.jsx`); // 目标路径
+    const destinationFile = path.join(process.cwd(), `index1.jsx`); // 目标路径
     shell.cp(sourceFile, destinationFile);
     if (shell.error()) {
         console.error('复制文件失败');
