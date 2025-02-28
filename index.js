@@ -11,7 +11,6 @@ const logsymbols = require('log-symbols')
 const readline = require('readline');
 var shell = require("shelljs");
 const path = require('path');
-const { error } = require('console');
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
@@ -146,14 +145,47 @@ program
 program.command('copyfile')
 .description('自动提交代码,应对代码量检查')
 .action(async function(commit,build){
-    const sourceFile = path.join(process.cwd(), 'index.jsx'); // 当前目录下的 source.txt
-    const destinationFile = path.join(process.cwd(), `index1.jsx`); // 目标路径
-    shell.cp(sourceFile, destinationFile);
-    if (shell.error()) {
-        console.error('复制文件失败');
-        shell.exit(1)
+    // const sourceFile = path.join(process.cwd(), 'index.jsx'); // 当前目录下的 source.txt
+    // const destinationFile = path.join(process.cwd(), `index1.jsx`); // 目标路径
+    // shell.cp(sourceFile, destinationFile);
+    // if (shell.error()) {
+    //     console.error('复制文件失败');
+    //     shell.exit(1)
 
+    // }
+    const sourceFile = path.join(process.cwd(), 'index.jsx'); // 获取用户当前目录的 index.jsx
+    const destinationDir = path.join(process.cwd()); // 目标目录
+    
+    // 确保目标目录存在
+    shell.mkdir('-p', destinationDir);
+    
+    // 获取文件基础名称和扩展名
+    const baseName = path.basename(sourceFile, path.extname(sourceFile)); // index
+    const ext = path.extname(sourceFile); // .jsx
+    
+    // 生成递增的目标文件名
+    let counter = 1;
+    let destinationFile = path.join(destinationDir, `${baseName}_${counter}${ext}`);
+    
+    // 循环查找可用的文件名
+    while (fs.existsSync(destinationFile)) {
+      counter++;
+      destinationFile = path.join(destinationDir, `${baseName}_${counter}${ext}`);
     }
+    
+    // 复制文件
+    shell.cp(sourceFile, destinationFile);
+    
+    // 检查错误
+    if (shell.error()) {
+      console.error('复制文件失败');
+      shell.exit(1)
+    } else {
+      console.log(`复制成功！文件已保存为: ${destinationFile}`);
+    }
+
+
+
     console.log('复制文件成功');
     console.log('获取当前分支');
     let stdout = shell.exec("git rev-parse --abbrev-ref HEAD")
