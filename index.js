@@ -10,6 +10,8 @@ const chalk = require('chalk');
 const logsymbols = require('log-symbols')
 const readline = require('readline');
 var shell = require("shelljs");
+const path = require('path');
+const { error } = require('console');
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
@@ -22,7 +24,7 @@ const templates = {
 }
 let loing = null;
 program
-  .version('1.1.7')
+  .version('1.1.8')
 program
   .command('init <project>')
   .description('初始化 移动端 ')
@@ -129,6 +131,65 @@ program
     if(status.indexOf('vue.config.js') > -1){
       shell.exec(`git restore --staged vue.config.js`)
       console.log('vue.config.js 取消上传此文件，如果想要上传此文件请手动上传')
+    }
+    if(add == 0){
+      console.log('提交文件')
+      shell.exec(`git commit -m ${commit}`)
+      console.log(`git push origin ${stdout}:${stdout}`)
+      loing = ora("上传中...").start();
+      setTimeout(() => {
+        pushfun(`git push origin ${stdout}:${stdout}`)
+      }, 10000);
+    }
+});
+
+program.command('copyfile')
+.description('自动提交代码,应对代码量检查')
+.action(async function(commit,build){
+    const sourceFile = path.join(process.cwd(), 'index.jsx'); // 当前目录下的 source.txt
+    const destinationFile = path.join(process.cwd(), `index${transformTimestamp()}.jsx`); // 目标路径
+    shell.cp(sourceFile, destinationFile);
+    if (shell.error()) {
+        console.error('复制文件失败');
+        shell.exit(1)
+
+    }
+    console.log('复制文件成功');
+    console.log('获取当前分支');
+    let stdout = shell.exec("git rev-parse --abbrev-ref HEAD")
+    console.log('当前分支为：' + stdout);
+    stdout = stdout.substring(stdout.length-1,-1)
+    console.log(stdout)
+    let add = shell.exec(`git add -A .`)
+    // let status = shell.exec('git status')
+    // if(status.indexOf('api/server.js') > -1){
+    //   shell.exec(`git restore --staged api/server.js.js`)
+    //   console.log('api/server.js 取消上传此文件，如果想要上传此文件请手动上传')
+    // }
+    if(add == 0){
+      console.log('提交文件')
+      shell.exec(`git commit -m 优化代码对比，增加新页面`)
+      console.log(`git push origin ${stdout}:${stdout}`)
+      loing = ora("上传中...").start();
+      setTimeout(() => {
+        pushfun(`git push origin ${stdout}:${stdout}`)
+      }, 10000);
+    }
+});
+
+program.command('qmgit <commit>')
+.description('自动提交代码,取消上传serve.js文件')
+.action(async function(commit,build){
+    console.log('获取当前分支');
+    let stdout = shell.exec("git rev-parse --abbrev-ref HEAD")
+    console.log('当前分支为：' + stdout);
+    stdout = stdout.substring(stdout.length-1,-1)
+    console.log(stdout)
+    let add = shell.exec(`git add -A .`)
+    let status = shell.exec('git status')
+    if(status.indexOf('api/server.js') > -1){
+      shell.exec(`git restore --staged api/server.js.js`)
+      console.log('api/server.js 取消上传此文件，如果想要上传此文件请手动上传')
     }
     if(add == 0){
       console.log('提交文件')
