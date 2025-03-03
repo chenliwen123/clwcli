@@ -81,7 +81,7 @@ function transformTimestamp(){
   const M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
   const D = (date.getDate() < 10 ? '0'+date.getDate() : date.getDate()) + '  ';
   const h = (date.getHours() < 10 ? '0'+date.getHours() : date.getHours()) + ':';
-  const m = (date.getMinutes() <10 ? '0'+date.getMinutes() : date.getMinutes()) ;
+  const m = (date.getMinutes() <10 ? '0'+date.getMinutes() : date.getMinutes()) + ':' ;
   const s = (date.getSeconds() <10 ? '0'+date.getSeconds() : date.getSeconds()) ;
   const dateString = Y + M + D + h + m + s;
   return dateString;
@@ -183,21 +183,12 @@ program.command('copyfile')
     } else {
       console.log(`复制成功！文件已保存为: ${destinationFile}`);
     }
-
-
-
-    console.log('复制文件成功');
     console.log('获取当前分支');
     let stdout = shell.exec("git rev-parse --abbrev-ref HEAD")
     console.log('当前分支为：' + stdout);
     stdout = stdout.substring(stdout.length-1,-1)
     console.log(stdout)
     let add = shell.exec(`git add -A .`)
-    // let status = shell.exec('git status')
-    // if(status.indexOf('api/server.js') > -1){
-    //   shell.exec(`git restore --staged api/server.js.js`)
-    //   console.log('api/server.js 取消上传此文件，如果想要上传此文件请手动上传')
-    // }
     if(add == 0){
       console.log('提交文件')
       shell.exec(`git commit -m 优化代码对比，增加新页面`)
