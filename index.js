@@ -15,6 +15,7 @@ const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
 });
+const { wait } = require('./utils/index');
 const templates = {
   'mobile' : {
     url:"https://github.com/chenliwen123/mobile",
@@ -23,7 +24,7 @@ const templates = {
 }
 let loing = null;
 program
-  .version('1.1.8')
+  .version('1.1.10')
 program
   .command('init <project>')
   .description('初始化 移动端 ')
@@ -249,6 +250,51 @@ program.command('qmgit <commit>')
         pushfun(`git push origin ${stdout}:${stdout}`)
       }, 10000);
     }
+});
+
+program
+.command('autoMerge [branch]')
+.description('自动合并分支到dev、sit')
+.action(async function(branch){
+    console.log('获取当前分支');
+    let stdout = shell.exec("git rev-parse --abbrev-ref HEAD")
+    console.log('当前分支为：' + stdout);
+    stdout = stdout.substring(stdout.length-1,-1)
+    if(branch != stdout){ // 如果当前分支不是要合并的分支
+        console.log('分支不一致，正在切换至' + branch + '分支');
+        shell.exec(`git checkout ${branch}`)
+        await wait(1000);
+        shell.exec(`git pull origin ${branch}`)
+        await wait(1000);
+        console.log('切换至' + branch + '分支成功');
+    }
+    console.log('切换dev分支');
+    shell.exec(`git checkout dev`)
+    await wait(1000);
+    console.log('拉取dev分支');
+    shell.exec(`git pull origin dev`)
+    await wait(1000);
+    console.log('合并' + branch + '分支');
+    shell.exec(`git merge ${branch}`)
+    await wait(1000);
+    console.log('推送dev分支');
+    shell.exec(`git push origin dev:dev`)
+    await wait(1000);
+    console.log('切换sit分支');
+    shell.exec(`git checkout sit`)
+    await wait(1000);
+    console.log('拉取sit分支');
+    shell.exec(`git pull origin sit`)
+    await wait(1000);
+    console.log('合并dev分支');
+    shell.exec(`git merge dev`)
+    await wait(1000);
+    console.log('推送sit分支');
+    shell.exec(`git push origin sit:sit`);
+    await wait(1000);
+    console.log('合并完成');
+    console.log('完成时间：' + transformTimestamp());
+    shell.exit(1)
 });
 
 program.parse(process.argv);
