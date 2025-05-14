@@ -258,9 +258,11 @@ program
 .action(async function(branch){
     console.log('获取当前分支');
     let stdout = shell.exec("git rev-parse --abbrev-ref HEAD")
-    console.log('当前分支为：' + stdout);
     stdout = stdout.substring(stdout.length-1,-1)
-    if(branch != stdout){ // 如果当前分支不是要合并的分支
+    await wait(1000);
+    const handerBarch = branch || stdout
+    console.log('当前分支为：' + handerBarch);
+    if(branch && branch != stdout){ // 如果当前分支不是要合并的分支
         console.log('分支不一致，正在切换至' + branch + '分支');
         shell.exec(`git checkout ${branch}`)
         await wait(1000);
@@ -274,8 +276,8 @@ program
     console.log('拉取dev分支');
     shell.exec(`git pull origin dev`)
     await wait(1000);
-    console.log('合并' + branch + '分支');
-    shell.exec(`git merge ${branch}`)
+    console.log('合并' +  handerBarch + '分支');
+    shell.exec(`git merge ${handerBarch}`)
     await wait(1000);
     console.log('推送dev分支');
     shell.exec(`git push origin dev:dev`)
