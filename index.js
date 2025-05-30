@@ -296,6 +296,11 @@ program
     await wait(1000);
     console.log('合并完成');
     console.log('完成时间：' + transformTimestamp());
+    loing = ora("合并完成").succeed();
+    console.log(logsymbols.success,chalk.yellow("合并分支成功"));
+    shell.exec(`git checkout ${stdout}`) // 切换回原来的分支
+    console.log('切换回原来的分支：' + stdout);
+
     shell.exit(1)
 });
 
