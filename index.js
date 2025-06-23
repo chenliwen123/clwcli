@@ -169,63 +169,65 @@ program
     }
 });
 
-program.command('copyfile [commit]')
-.description('自动提交代码,应对代码量检查')
-.action(async function(commit,build){
-    // const sourceFile = path.join(process.cwd(), 'index.jsx'); // 当前目录下的 source.txt
-    // const destinationFile = path.join(process.cwd(), `index1.jsx`); // 目标路径
-    // shell.cp(sourceFile, destinationFile);
-    // if (shell.error()) {
-    //     console.error('复制文件失败');
-    //     shell.exit(1)
-
-    // }
+program.command('copyfile [commits]')
+.description('自动提交代码,应对代码量检查 (可用逗号分隔多个commit)')
+.action(async function(commits, build){
     const sourceFile = path.join(process.cwd(), 'index.jsx'); // 获取用户当前目录的 index.jsx
-    const destinationDir = path.join(process.cwd()); // 目标目录
     
-    // 确保目标目录存在
-    shell.mkdir('-p', destinationDir);
-    
-    // 获取文件基础名称和扩展名
-    const baseName = path.basename(sourceFile, path.extname(sourceFile)); // index
-    const ext = path.extname(sourceFile); // .jsx
-    
-    // 生成递增的目标文件名
-    let counter = 1;
-    let destinationFile = path.join(destinationDir, `${baseName}_${counter}${ext}`);
-    
-    // 循环查找可用的文件名
-    while (fs.existsSync(destinationFile)) {
-      counter++;
-      destinationFile = path.join(destinationDir, `${baseName}_${counter}${ext}`);
+    // 检查源文件是否存在
+    if (!fs.existsSync(sourceFile)) {
+      console.error('源文件不存在:', sourceFile);
+      shell.exit(1);
+      return;
     }
     
-    // 复制文件
-    shell.cp(sourceFile, destinationFile);
-    
-    // 检查错误
-    if (shell.error()) {
-      console.error('复制文件失败');
-      shell.exit(1)
-    } else {
-      console.log(`复制成功！文件已保存为: ${destinationFile}`);
-    }
+    // 获取当前分支
     console.log('获取当前分支');
-    let stdout = shell.exec("git rev-parse --abbrev-ref HEAD")
+    let stdout = shell.exec("git rev-parse --abbrev-ref HEAD");
     console.log('当前分支为：' + stdout);
-    stdout = stdout.substring(stdout.length-1,-1)
-    console.log(stdout)
-    let add = shell.exec(`git add -A .`)
-    if(add == 0){
-      console.log('提交文件');
-      console.log('commit',commit)
-      shell.exec(`git commit -m "${commit || '优化代码对比，增加新页面'}"`)
-      console.log(`git push origin ${stdout}:${stdout}`)
-      loing = ora("上传中...").start();
-      setTimeout(() => {
-        pushfun(`git push origin ${stdout}:${stdout}`)
-      }, 10000);
+    stdout = stdout.substring(stdout.length-1,-1);
+    
+    // 处理多个commit
+    const commitMessages = commits ? commits.split(',') : ['优化代码对比，增加新页面'];
+    
+    for (const commit of commitMessages) {
+      // 创建新文件
+      const destinationDir = path.join(process.cwd());
+      const baseName = path.basename(sourceFile, path.extname(sourceFile));
+      const ext = path.extname(sourceFile);
+      
+      let counter = 1;
+      let destinationFile = path.join(destinationDir, `${baseName}_${counter}${ext}`);
+      
+      while (fs.existsSync(destinationFile)) {
+        counter++;
+        destinationFile = path.join(destinationDir, `${baseName}_${counter}${ext}`);
+      }
+      
+      // 复制文件
+      shell.cp(sourceFile, destinationFile);
+      
+      if (shell.error()) {
+        console.error('复制文件失败');
+        continue;
+      } else {
+        console.log(`复制成功！文件已保存为: ${destinationFile}`);
+      }
+      
+      // 提交这个文件
+      let add = shell.exec(`git add "${destinationFile}"`);
+      if(add.code === 0){
+        console.log(`提交文件，commit: ${commit.trim()}`);
+        shell.exec(`git commit -m "${commit.trim()}"`);
+      }
     }
+    
+    // 最后一次性推送所有提交
+    console.log(`git push origin ${stdout}:${stdout}`);
+    loing = ora("上传中...").start();
+    setTimeout(() => {
+      pushfun(`git push origin ${stdout}:${stdout}`);
+    }, 10000);
 });
 
 program.command('qmgit <commit>')
