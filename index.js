@@ -169,7 +169,7 @@ program
     }
 });
 
-program.command('copyfile')
+program.command('copyfile [commit]')
 .description('自动提交代码,应对代码量检查')
 .action(async function(commit,build){
     // const sourceFile = path.join(process.cwd(), 'index.jsx'); // 当前目录下的 source.txt
@@ -218,7 +218,7 @@ program.command('copyfile')
     let add = shell.exec(`git add -A .`)
     if(add == 0){
       console.log('提交文件')
-      shell.exec(`git commit -m 优化代码对比，增加新页面`)
+      shell.exec(`git commit -m ${commit || '优化代码对比，增加新页面'}`)
       console.log(`git push origin ${stdout}:${stdout}`)
       loing = ora("上传中...").start();
       setTimeout(() => {
