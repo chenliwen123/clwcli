@@ -217,8 +217,9 @@ program.command('copyfile [commit]')
     console.log(stdout)
     let add = shell.exec(`git add -A .`)
     if(add == 0){
-      console.log('提交文件')
-      shell.exec(`git commit -m ${commit || '优化代码对比，增加新页面'}`)
+      console.log('提交文件');
+      console.log('commit',commit)
+      shell.exec(`git commit -m "${commit || '优化代码对比，增加新页面'}"`)
       console.log(`git push origin ${stdout}:${stdout}`)
       loing = ora("上传中...").start();
       setTimeout(() => {
