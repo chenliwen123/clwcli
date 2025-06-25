@@ -59,8 +59,10 @@ module.exports = function(program) {
         // 提交这个文件
         let add = shell.exec(`git add "${destinationFile}"`);
         if(add.code === 0) {
-          console.log(`提交文件，commit: ${commit.trim()}`);
-          shell.exec(`git commit -m "${commit.trim()}"`);
+          // 过滤掉commit信息中的/**/相关内容
+          const filteredCommit = commit.trim().replace(/\/\*\*.*?\*\//g, '').trim();
+          console.log(`提交文件，commit: ${filteredCommit}`);
+          shell.exec(`git commit -m "${filteredCommit}"`);
         }
       }
       shell.exec(`git pull origin ${stdout}`);
