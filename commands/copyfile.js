@@ -2,7 +2,7 @@ const shell = require('shelljs');
 const fs = require('fs');
 const path = require('path');
 const ora = require('ora');
-const { pushfun } = require('../utils');
+const { pushfun, wait } = require('../utils');
 
 module.exports = function(program) {
   program
@@ -63,6 +63,9 @@ module.exports = function(program) {
           shell.exec(`git commit -m "${commit.trim()}"`);
         }
       }
+      shell.exec(`git pull origin ${stdout}`);
+
+      await wait(1500);
       
       // 最后一次性推送所有提交
       console.log(`git push origin ${stdout}:${stdout}`);
